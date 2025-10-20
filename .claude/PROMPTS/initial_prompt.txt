@@ -1,0 +1,11 @@
+Objective: Migrate this project from Spring Boot 2.3.1 and Java 8 to Spring Boot 3.4.4 and Java 17
+
+I have added some slash commands in @.claude/commands and subagents in @.claude/agents. I also have few slash commands and subagents (probably in python) located in @.claude/example-claude-commands-agents directory.
+
+I want you to adjust the slash commands and subagents that are most applicable for this migration and add/change/use some references from example-claude-commands-agents.
+Your task:
+
+1. Update the slash commands (@.claude/commands) and subagents (@.claude/agens) and use some references from @.claude/example-claude-commands-agents
+2. The intent is to have good set of slash commands and subagents that does the analysis, migration, code review, security check, vulnerability check, unit test, etc as per the current project programming language (Java), framework (Spring boot), etc. 
+
+Note: Create a TO DO list and ask for my permission before updating them. This repo is based on the article attached in @.claude/templates/migration_with_claude_code.pdf
