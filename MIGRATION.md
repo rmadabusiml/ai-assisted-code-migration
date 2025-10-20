@@ -5,6 +5,7 @@ This guide provides step-by-step instructions for migrating the Transaction Hist
 ## 📋 Table of Contents
 
 - [Overview](#overview)
+- [Architecture: Slash Commands & Sub-Agents](#-architecture-slash-commands--sub-agents)
 - [Prerequisites](#prerequisites)
 - [Migration Phases](#migration-phases)
 - [Detailed Phase Instructions](#detailed-phase-instructions)
@@ -29,6 +30,178 @@ This guide provides step-by-step instructions for migrating the Transaction Hist
 - Updated dependencies with security fixes
 
 **Migration Strategy:** AI-assisted systematic migration using Claude Code slash commands and specialized agents.
+
+---
+
+## 🤖 Architecture: Slash Commands & Sub-Agents
+
+This migration leverages Claude Code's slash command system, where each command delegates work to specialized AI sub-agents. Understanding this architecture helps you follow the migration workflow.
+
+> **Note:** The Mermaid diagram below renders on GitHub and in Mermaid-compatible viewers. If you see plain text, scroll down for the text-based architecture diagram or view this file on GitHub.
+
+```mermaid
+flowchart TB
+    User([User]) -->|Invokes| SlashCommands[Slash Commands]
+
+    SlashCommands --> AnalyzeProject[/analyze-project]
+    SlashCommands --> MigrateSB[/migrate-springboot]
+    SlashCommands --> ValidateBuild[/validate-build]
+    SlashCommands --> TestGenerate[/test-generate]
+    SlashCommands --> SecuritySAST[/security-sast]
+    SlashCommands --> SecurityDeps[/security-dependencies]
+    SlashCommands --> SecurityReview[/security-review]
+    SlashCommands --> ReviewCode[/review-code]
+
+    AnalyzeProject -->|Direct Execution| AnalysisTask[Project Analysis<br/>• Structure scan<br/>• Risk assessment<br/>• Effort estimation]
+
+    MigrateSB -->|Delegates to| JavaAgent[java-migration-specialist]
+    ValidateBuild -->|Delegates to| BuildAgent[build-validator]
+    TestGenerate -->|Delegates to| TestAgent[test-engineer]
+    SecuritySAST -->|Delegates to| SecurityAgent1[security-auditor]
+    SecurityDeps -->|Delegates to| DepsAgent[dependency-analyzer]
+    SecurityReview -->|Delegates to| SecurityAgent2[security-auditor]
+    ReviewCode -->|Delegates to| CodeReviewAgent[code-reviewer]
+
+    JavaAgent --> JavaTasks[Migration Tasks<br/>• Dependency updates<br/>• Namespace migration<br/>• API deprecation fixes]
+
+    BuildAgent --> BuildTasks[Build Tasks<br/>• Compilation fixes<br/>• Error resolution<br/>• Plugin updates]
+
+    TestAgent --> TestTasks[Test Tasks<br/>• Coverage analysis<br/>• Test generation<br/>• Test validation]
+
+    SecurityAgent1 --> SASTTasks[SAST Tasks<br/>• SpotBugs scan<br/>• PMD analysis<br/>• Pattern detection]
+
+    DepsAgent --> DepsTasks[Dependency Tasks<br/>• CVE scanning<br/>• SBOM generation<br/>• Update planning]
+
+    SecurityAgent2 --> SecurityTasks[Security Tasks<br/>• OWASP Top 10<br/>• Spring Security review<br/>• Secret detection]
+
+    CodeReviewAgent --> ReviewTasks[Review Tasks<br/>• Code quality<br/>• Architecture<br/>• Best practices]
+
+    AnalysisTask --> Results([Results])
+    JavaTasks --> Results
+    BuildTasks --> Results
+    TestTasks --> Results
+    SASTTasks --> Results
+    DepsTasks --> Results
+    SecurityTasks --> Results
+    ReviewTasks --> Results
+
+    style SlashCommands fill:#e1f5ff
+    style JavaAgent fill:#fff4e1
+    style BuildAgent fill:#fff4e1
+    style TestAgent fill:#fff4e1
+    style SecurityAgent1 fill:#ffe1e1
+    style DepsAgent fill:#ffe1e1
+    style SecurityAgent2 fill:#ffe1e1
+    style CodeReviewAgent fill:#e1ffe1
+    style User fill:#f0f0f0
+    style Results fill:#f0f0f0
+```
+
+### Text-Based Architecture Diagram
+
+```
+┌──────────┐
+│   USER   │
+└────┬─────┘
+     │ Invokes slash commands
+     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      SLASH COMMANDS                              │
+│  /analyze-project  /migrate-springboot  /validate-build         │
+│  /test-generate    /security-sast       /security-dependencies  │
+│  /security-review  /review-code                                 │
+└────┬───────────────┬───────────────┬────────────┬──────────────┘
+     │               │               │            │
+     │ Direct        │ Delegates     │ Delegates  │ Delegates
+     │               │               │            │
+     ▼               ▼               ▼            ▼
+┌──────────┐   ┌─────────────────────────────────────────────┐
+│ Project  │   │         SPECIALIZED SUB-AGENTS              │
+│ Analysis │   │                                             │
+└────┬─────┘   │  ┌──────────────────────────────────────┐  │
+     │         │  │ java-migration-specialist            │  │ ← /migrate-springboot
+     │         │  │  • Dependency updates                │  │
+     │         │  │  • Namespace migration (javax→jakarta)│  │
+     │         │  │  • API deprecation fixes             │  │
+     │         │  └──────────────────────────────────────┘  │
+     │         │                                             │
+     │         │  ┌──────────────────────────────────────┐  │
+     │         │  │ build-validator                      │  │ ← /validate-build
+     │         │  │  • Compilation error diagnosis       │  │
+     │         │  │  • Iterative error fixing            │  │
+     │         │  │  • Maven plugin configuration        │  │
+     │         │  └──────────────────────────────────────┘  │
+     │         │                                             │
+     │         │  ┌──────────────────────────────────────┐  │
+     │         │  │ test-engineer                        │  │ ← /test-generate
+     │         │  │  • Coverage analysis (JaCoCo)        │  │
+     │         │  │  • JUnit 5 test generation           │  │
+     │         │  │  • Mockito test patterns             │  │
+     │         │  └──────────────────────────────────────┘  │
+     │         │                                             │
+     │         │  ┌──────────────────────────────────────┐  │
+     │         │  │ security-auditor                     │  │ ← /security-sast
+     │         │  │  • SpotBugs + FindSecBugs           │  │   /security-review
+     │         │  │  • PMD security rules                │  │
+     │         │  │  • OWASP Top 10 analysis             │  │
+     │         │  │  • Spring Security review            │  │
+     │         │  └──────────────────────────────────────┘  │
+     │         │                                             │
+     │         │  ┌──────────────────────────────────────┐  │
+     │         │  │ dependency-analyzer                  │  │ ← /security-dependencies
+     │         │  │  • OWASP Dependency-Check            │  │
+     │         │  │  • CVE scanning                      │  │
+     │         │  │  • SBOM generation (CycloneDX)       │  │
+     │         │  └──────────────────────────────────────┘  │
+     │         │                                             │
+     │         │  ┌──────────────────────────────────────┐  │
+     │         │  │ code-reviewer                        │  │ ← /review-code
+     │         │  │  • SOLID principles check            │  │
+     │         │  │  • Spring Boot best practices        │  │
+     │         │  │  • Architecture validation           │  │
+     │         │  └──────────────────────────────────────┘  │
+     │         └─────────────────┬───────────────────────────┘
+     │                           │
+     ▼                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                           RESULTS                                │
+│  • Analysis reports    • Code changes    • Test generation      │
+│  • Security findings   • Build fixes     • Quality improvements │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Command → Agent Mapping
+
+| Slash Command | Sub-Agent | Primary Responsibility |
+|---------------|-----------|------------------------|
+| `/analyze-project` | *(Direct)* | Pre-migration analysis and risk assessment |
+| `/migrate-springboot` | `java-migration-specialist` | Core Spring Boot 2→3 and Java 8→17 migration |
+| `/validate-build` | `build-validator` | Iterative compilation error fixing |
+| `/test-generate` | `test-engineer` | JUnit 5 test generation and coverage improvement |
+| `/security-sast` | `security-auditor` | Static Application Security Testing (SAST) |
+| `/security-dependencies` | `dependency-analyzer` | Dependency vulnerability scanning and SBOM |
+| `/security-review` | `security-auditor` | Comprehensive OWASP Top 10 security review |
+| `/review-code` | `code-reviewer` | Code quality, architecture, and best practices |
+
+### How It Works
+
+1. **User Triggers Slash Command**: You type a command like `/migrate-springboot` in Claude Code
+2. **Command Expands**: The slash command loads its instructions from `.claude/commands/`
+3. **Agent Delegation**: Most commands delegate to a specialized sub-agent with specific expertise
+4. **Agent Execution**: The sub-agent autonomously performs its tasks using available tools (Read, Edit, Bash, Grep, Glob)
+5. **Results Returned**: The agent reports findings, changes made, and next steps
+6. **Sequential Workflow**: Commands are typically executed in sequence following the 8-phase migration plan
+
+### Agent Capabilities
+
+Each sub-agent has access to specific tools and expertise:
+
+- **java-migration-specialist**: Expert in Spring Boot 2→3 migrations, Java version upgrades, dependency management
+- **build-validator**: Maven expert, compilation error diagnostics, plugin configuration
+- **test-engineer**: JUnit 5, Mockito, test coverage analysis, AssertJ assertions
+- **security-auditor**: OWASP Top 10, Spring Security, SAST tools (SpotBugs, PMD, Semgrep)
+- **dependency-analyzer**: OWASP Dependency-Check, SBOM generation, CVE database
+- **code-reviewer**: SOLID principles, Spring Boot best practices, architectural patterns
 
 ---
 
