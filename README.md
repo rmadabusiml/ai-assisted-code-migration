@@ -527,7 +527,7 @@ Timestamp: 2025-01-20 14:30 UTC
 
 **AI-Assisted Migration with Claude Code:**
 - Total Human Time: 15-20 hours (strategic reviews)
-- Total AI Time: 12-15 hours (automated transformations)
+- Total AI Time: 20-25 hours (automated transformations)
 - Error Rate: Low (systematic, comprehensive coverage)
 - Consistency: High (same logic applied everywhere)
 - Documentation: Automatically generated at each phase
