@@ -37,68 +37,6 @@ This guide provides step-by-step instructions for migrating the Transaction Hist
 
 This migration leverages Claude Code's slash command system, where each command delegates work to specialized AI sub-agents. Understanding this architecture helps you follow the migration workflow.
 
-> **Note:** The Mermaid diagram below renders on GitHub and in Mermaid-compatible viewers. If you see plain text, scroll down for the text-based architecture diagram or view this file on GitHub.
-
-```mermaid
-flowchart TB
-    User([User]) -->|Invokes| SlashCommands[Slash Commands]
-
-    SlashCommands --> AnalyzeProject[/analyze-project]
-    SlashCommands --> MigrateSB[/migrate-springboot]
-    SlashCommands --> ValidateBuild[/validate-build]
-    SlashCommands --> TestGenerate[/test-generate]
-    SlashCommands --> SecuritySAST[/security-sast]
-    SlashCommands --> SecurityDeps[/security-dependencies]
-    SlashCommands --> SecurityReview[/security-review]
-    SlashCommands --> ReviewCode[/review-code]
-
-    AnalyzeProject -->|Direct Execution| AnalysisTask[Project Analysis<br/>• Structure scan<br/>• Risk assessment<br/>• Effort estimation]
-
-    MigrateSB -->|Delegates to| JavaAgent[java-migration-specialist]
-    ValidateBuild -->|Delegates to| BuildAgent[build-validator]
-    TestGenerate -->|Delegates to| TestAgent[test-engineer]
-    SecuritySAST -->|Delegates to| SecurityAgent1[security-auditor]
-    SecurityDeps -->|Delegates to| DepsAgent[dependency-analyzer]
-    SecurityReview -->|Delegates to| SecurityAgent2[security-auditor]
-    ReviewCode -->|Delegates to| CodeReviewAgent[code-reviewer]
-
-    JavaAgent --> JavaTasks[Migration Tasks<br/>• Dependency updates<br/>• Namespace migration<br/>• API deprecation fixes]
-
-    BuildAgent --> BuildTasks[Build Tasks<br/>• Compilation fixes<br/>• Error resolution<br/>• Plugin updates]
-
-    TestAgent --> TestTasks[Test Tasks<br/>• Coverage analysis<br/>• Test generation<br/>• Test validation]
-
-    SecurityAgent1 --> SASTTasks[SAST Tasks<br/>• SpotBugs scan<br/>• PMD analysis<br/>• Pattern detection]
-
-    DepsAgent --> DepsTasks[Dependency Tasks<br/>• CVE scanning<br/>• SBOM generation<br/>• Update planning]
-
-    SecurityAgent2 --> SecurityTasks[Security Tasks<br/>• OWASP Top 10<br/>• Spring Security review<br/>• Secret detection]
-
-    CodeReviewAgent --> ReviewTasks[Review Tasks<br/>• Code quality<br/>• Architecture<br/>• Best practices]
-
-    AnalysisTask --> Results([Results])
-    JavaTasks --> Results
-    BuildTasks --> Results
-    TestTasks --> Results
-    SASTTasks --> Results
-    DepsTasks --> Results
-    SecurityTasks --> Results
-    ReviewTasks --> Results
-
-    style SlashCommands fill:#e1f5ff
-    style JavaAgent fill:#fff4e1
-    style BuildAgent fill:#fff4e1
-    style TestAgent fill:#fff4e1
-    style SecurityAgent1 fill:#ffe1e1
-    style DepsAgent fill:#ffe1e1
-    style SecurityAgent2 fill:#ffe1e1
-    style CodeReviewAgent fill:#e1ffe1
-    style User fill:#f0f0f0
-    style Results fill:#f0f0f0
-```
-
-### Text-Based Architecture Diagram
-
 ```
 ┌──────────┐
 │   USER   │
@@ -106,65 +44,65 @@ flowchart TB
      │ Invokes slash commands
      ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      SLASH COMMANDS                              │
+│                      SLASH COMMANDS                             │
 │  /analyze-project  /migrate-springboot  /validate-build         │
 │  /test-generate    /security-sast       /security-dependencies  │
 │  /security-review  /review-code                                 │
-└────┬───────────────┬───────────────┬────────────┬──────────────┘
+└────┬───────────────┬───────────────┬────────────┬──────────────-┘
      │               │               │            │
      │ Direct        │ Delegates     │ Delegates  │ Delegates
      │               │               │            │
      ▼               ▼               ▼            ▼
-┌──────────┐   ┌─────────────────────────────────────────────┐
-│ Project  │   │         SPECIALIZED SUB-AGENTS              │
-│ Analysis │   │                                             │
+┌──────────┐   ┌────────────────────────────────────────────┐
+│ Project  │   │         SPECIALIZED SUB-AGENTS             │
+│ Analysis │   │                                            │
 └────┬─────┘   │  ┌──────────────────────────────────────┐  │
      │         │  │ java-migration-specialist            │  │ ← /migrate-springboot
      │         │  │  • Dependency updates                │  │
-     │         │  │  • Namespace migration (javax→jakarta)│  │
+     │         │  │  • Namespace migration(javax→jakarta)│  │
      │         │  │  • API deprecation fixes             │  │
      │         │  └──────────────────────────────────────┘  │
-     │         │                                             │
+     │         │                                            │
      │         │  ┌──────────────────────────────────────┐  │
      │         │  │ build-validator                      │  │ ← /validate-build
      │         │  │  • Compilation error diagnosis       │  │
      │         │  │  • Iterative error fixing            │  │
      │         │  │  • Maven plugin configuration        │  │
      │         │  └──────────────────────────────────────┘  │
-     │         │                                             │
+     │         │                                            │
      │         │  ┌──────────────────────────────────────┐  │
      │         │  │ test-engineer                        │  │ ← /test-generate
      │         │  │  • Coverage analysis (JaCoCo)        │  │
      │         │  │  • JUnit 5 test generation           │  │
      │         │  │  • Mockito test patterns             │  │
      │         │  └──────────────────────────────────────┘  │
-     │         │                                             │
+     │         │                                            │
      │         │  ┌──────────────────────────────────────┐  │
      │         │  │ security-auditor                     │  │ ← /security-sast
-     │         │  │  • SpotBugs + FindSecBugs           │  │   /security-review
+     │         │  │  • SpotBugs + FindSecBugs            │  │   /security-review
      │         │  │  • PMD security rules                │  │
      │         │  │  • OWASP Top 10 analysis             │  │
      │         │  │  • Spring Security review            │  │
      │         │  └──────────────────────────────────────┘  │
-     │         │                                             │
+     │         │                                            │
      │         │  ┌──────────────────────────────────────┐  │
      │         │  │ dependency-analyzer                  │  │ ← /security-dependencies
      │         │  │  • OWASP Dependency-Check            │  │
      │         │  │  • CVE scanning                      │  │
      │         │  │  • SBOM generation (CycloneDX)       │  │
      │         │  └──────────────────────────────────────┘  │
-     │         │                                             │
+     │         │                                            │
      │         │  ┌──────────────────────────────────────┐  │
      │         │  │ code-reviewer                        │  │ ← /review-code
      │         │  │  • SOLID principles check            │  │
      │         │  │  • Spring Boot best practices        │  │
      │         │  │  • Architecture validation           │  │
      │         │  └──────────────────────────────────────┘  │
-     │         └─────────────────┬───────────────────────────┘
+     │         └─────────────────┬──────────────────────────┘
      │                           │
      ▼                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                           RESULTS                                │
+│                           RESULTS                               │
 │  • Analysis reports    • Code changes    • Test generation      │
 │  • Security findings   • Build fixes     • Quality improvements │
 └─────────────────────────────────────────────────────────────────┘
