@@ -201,25 +201,6 @@ ls .claude/agents/
 
 ---
 
-## Migration Phases
-
-The migration consists of 8 phases executed sequentially:
-
-| Phase | Command | Purpose | Est. Time |
-|-------|---------|---------|-----------|
-| 1 | `/analyze-project` | Assess migration complexity | 5-10 min |
-| 2 | `/migrate-springboot` | Execute core migration | 30-60 min |
-| 3 | `/validate-build` | Fix compilation errors | 15-30 min |
-| 4 | `/test-generate` | Generate missing tests | 20-40 min |
-| 5 | `/security-sast` | Static security analysis | 10-15 min |
-| 6 | `/security-dependencies` | Dependency vulnerability scan | 10-15 min |
-| 7 | `/security-review` | Comprehensive security review | 15-20 min |
-| 8 | `/review-code` | Code quality review | 15-20 min |
-
-**Total Estimated Time:** 2-4 hours
-
----
-
 ## Detailed Phase Instructions
 
 ### Phase 1: Project Analysis
